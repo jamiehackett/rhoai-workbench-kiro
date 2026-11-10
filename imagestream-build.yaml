@@ -1,0 +1,16 @@
+# Optional build-target ImageStream (no notebook-image labels).
+# Used only as the BuildConfig output destination in a build project.
+#
+#   export BUILD_NAMESPACE=my-build-project
+#   envsubst '${BUILD_NAMESPACE}' < imagestream-build.yaml | oc apply -f -
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: kiro-codeserver
+  namespace: ${BUILD_NAMESPACE}
+  labels:
+    app: kiro-codeserver
+    app.kubernetes.io/name: kiro-codeserver
+spec:
+  lookupPolicy:
+    local: true

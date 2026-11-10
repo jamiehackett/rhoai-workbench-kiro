@@ -1,0 +1,33 @@
+# Optional OpenShift BuildConfig. Containerfile FROM is the source of truth
+# (public registry.redhat.io digest); dockerStrategy.from is omitted on purpose.
+#
+# Prerequisites:
+# - Cluster pull secret / linked secret that can pull registry.redhat.io
+# - imagestream-build.yaml applied in the same BUILD_NAMESPACE
+#
+#   export BUILD_NAMESPACE=my-build-project
+#   envsubst '${BUILD_NAMESPACE}' < imagestream-build.yaml | oc apply -f -
+#   envsubst '${BUILD_NAMESPACE}' < buildconfig.yaml | oc apply -f -
+#   oc start-build kiro-codeserver -n "$BUILD_NAMESPACE" --from-dir=. --follow
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: kiro-codeserver
+  namespace: ${BUILD_NAMESPACE}
+  labels:
+    app: kiro-codeserver
+    app.kubernetes.io/name: kiro-codeserver
+spec:
+  successfulBuildsHistoryLimit: 3
+  failedBuildsHistoryLimit: 3
+  output:
+    to:
+      kind: ImageStreamTag
+      name: kiro-codeserver:0.1.0
+  source:
+    type: Binary
+  strategy:
+    type: Docker
+    dockerStrategy:
+      dockerfilePath: Containerfile
+  triggers: []

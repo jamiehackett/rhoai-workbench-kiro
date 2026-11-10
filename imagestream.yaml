@@ -1,0 +1,77 @@
+# Cluster-wide RHOAI workbench ImageStream (register in redhat-ods-applications).
+#
+#   export IMAGE_REF='image-registry.openshift-image-registry.svc:5000/<build-ns>/kiro-codeserver:0.1.0'
+#   # or: export IMAGE_REF='quay.io/<org>/kiro-codeserver:0.1.0'
+#   envsubst '${IMAGE_REF}' < imagestream.yaml | oc apply -f -
+#
+# Requires permission to create ImageStreams in redhat-ods-applications
+# (OpenShift AI / cluster admin). Prefer dashboard Import when available:
+# Settings → Workbench images → Import workbench image.
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: kiro-codeserver
+  namespace: redhat-ods-applications
+  labels:
+    opendatahub.io/dashboard: "true"
+    opendatahub.io/notebook-image: "true"
+    app.opendatahub.io/workbenches: "true"
+  annotations:
+    opendatahub.io/notebook-image-name: "Code Server | Data Science + Kiro | CPU | Python 3.12"
+    opendatahub.io/notebook-image-desc: "Custom image based on the official RHOAI Code Server Data Science CPU Python 3.12 workbench (3.5 / 47efb6c) with AWS Kiro CLI baked in."
+    opendatahub.io/notebook-image-url: "https://kiro.dev/docs/cli/"
+    opendatahub.io/notebook-image-order: "30"
+spec:
+  lookupPolicy:
+    local: true
+  tags:
+    - name: "0.1.0"
+      annotations:
+        opendatahub.io/notebook-build-commit: "47efb6c-kiro"
+        opendatahub.io/workbench-image-recommended: "true"
+        opendatahub.io/notebook-software: |
+          [
+            {"name": "code-server", "version": "4.106"},
+            {"name": "Python", "version": "v3.12"},
+            {"name": "Kiro CLI", "version": "bundled"}
+          ]
+        opendatahub.io/notebook-python-dependencies: |
+          [
+            {"name": "Boto3", "version": "1.43"},
+            {"name": "Numpy", "version": "2.5"},
+            {"name": "Pandas", "version": "2.3"},
+            {"name": "Scikit-learn", "version": "1.9"},
+            {"name": "ipykernel", "version": "7.3"},
+            {"name": "Kiro CLI", "version": "bundled"}
+          ]
+      from:
+        kind: DockerImage
+        name: ${IMAGE_REF}
+      importPolicy: {}
+      referencePolicy:
+        type: Source
+    - name: latest
+      annotations:
+        opendatahub.io/notebook-build-commit: "47efb6c-kiro"
+        opendatahub.io/workbench-image-recommended: "true"
+        opendatahub.io/notebook-software: |
+          [
+            {"name": "code-server", "version": "4.106"},
+            {"name": "Python", "version": "v3.12"},
+            {"name": "Kiro CLI", "version": "bundled"}
+          ]
+        opendatahub.io/notebook-python-dependencies: |
+          [
+            {"name": "Boto3", "version": "1.43"},
+            {"name": "Numpy", "version": "2.5"},
+            {"name": "Pandas", "version": "2.3"},
+            {"name": "Scikit-learn", "version": "1.9"},
+            {"name": "ipykernel", "version": "7.3"},
+            {"name": "Kiro CLI", "version": "bundled"}
+          ]
+      from:
+        kind: ImageStreamTag
+        name: kiro-codeserver:0.1.0
+      importPolicy: {}
+      referencePolicy:
+        type: Source

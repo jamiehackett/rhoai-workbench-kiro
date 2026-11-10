@@ -1,0 +1,16 @@
+# Local / editor
+.DS_Store
+*.swp
+*~
+.idea/
+.vscode/
+
+# Secrets / env
+.env
+.env.*
+*.pem
+*.key
+
+# Build artifacts
+*.tar
+*.tar.gz
